@@ -31,6 +31,21 @@ Modified files
         modified:   src/anthropic/types/completion.py
 ```
 
+## Integrate with LangChain
+
+```sh
+pip install langchain
+```
+
+```sh
+pip install jupyter
+```
+
+```sh
+pip install attrs==22.2.0
+```
+
+
 # Anthropic Python API Library
 
 [![PyPI version](https://img.shields.io/pypi/v/anthropic.svg)](https://pypi.org/project/anthropic/)

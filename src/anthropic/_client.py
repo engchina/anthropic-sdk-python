@@ -150,6 +150,7 @@ class Anthropic(SyncAPIClient):
             **super().default_headers,
             "anthropic-version": "2023-06-01",
             # added by engchina on 20230806 begin
+            # "Host": "claude.ai",
             "Accept": "*/*",
             "Accept-Language": "en-US,en;q=0.5",
             "Referer": "https://claude.ai/chats",

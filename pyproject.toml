@@ -5,19 +5,21 @@ description = "Client library for the anthropic API"
 readme = "README.md"
 authors = ["Anthropic <support@anthropic.com>"]
 license = "MIT"
-repository = "https://github.com/anthropics/anthropic-sdk-python"
+repository = "https://github.com/engchina/anthropic-sdk-python"
 packages = [
   { include = "anthropic", from = "src" }
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.10"
 httpx = ">= 0.23.0, < 1"
 pydantic = "^1.9.0"
 typing-extensions = ">= 4.1.1, < 5"
 anyio = ">= 3.5.0, < 4"
 distro = ">= 1.7.0, < 2"
 tokenizers = ">= 0.13.0"
+jupyter = "^1.0.0"
+langchain = "^0.0.253"
 
 [tool.poetry.group.dev.dependencies]
 pyright = "1.1.318"
@@ -55,7 +57,7 @@ filterwarnings = [
 # there are a couple of flags that are still disabled by
 # default in strict mode as they are experimental and niche.
 typeCheckingMode = "strict"
-pythonVersion = "3.7"
+pythonVersion = "3.10"
 
 exclude = [
     "_dev",

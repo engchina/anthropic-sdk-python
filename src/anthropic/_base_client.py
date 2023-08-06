@@ -379,6 +379,10 @@ class BaseClient:
 
             headers[idempotency_header] = options.idempotency_key
 
+        # added by engchina on 20230806 begin
+        # headers["Host"] = "https://claude.ai"
+        # added by engchina on 20230806 end
+
         return headers
 
     def _prepare_request(self, request: httpx.Request) -> None:
