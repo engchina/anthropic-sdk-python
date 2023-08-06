@@ -1,12 +1,20 @@
 #!/usr/bin/env -S poetry run python
 
 import asyncio
+import os
 
 from anthropic import Anthropic, AsyncAnthropic
 
 
 def sync_tokens() -> None:
-    client = Anthropic()
+    # modified by engchina on 20230806 begin
+    #  client = Anthropic()
+    from dotenv import load_dotenv, find_dotenv
+
+    _ = load_dotenv(find_dotenv())  # read local .env file
+
+    client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    # modified by engchina on 20230806 end
 
     text = "hello world!"
 
@@ -17,7 +25,14 @@ def sync_tokens() -> None:
 
 
 async def async_tokens() -> None:
-    anthropic = AsyncAnthropic()
+    # modified by engchina on 20230806 begin
+    #  anthropic = AsyncAnthropic()
+    from dotenv import load_dotenv, find_dotenv
+
+    _ = load_dotenv(find_dotenv())  # read local .env file
+
+    anthropic = AsyncAnthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    # modified by engchina on 20230806 end
 
     text = "fist message"
     tokens = await anthropic.count_tokens(text)

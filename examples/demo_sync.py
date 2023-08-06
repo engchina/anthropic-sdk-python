@@ -1,11 +1,18 @@
 #!/usr/bin/env -S poetry run python
+import os
 
 import anthropic
 from anthropic import Anthropic
 
 
 def main() -> None:
-    client = Anthropic()
+    # modified by engchina on 20230806 begin
+    # client = Anthropic()
+    from dotenv import load_dotenv, find_dotenv
+    _ = load_dotenv(find_dotenv())  # read local .env file
+
+    client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    # modified by engchina on 20230806 end
 
     res = client.completions.create(
         model="claude-2",

@@ -1,3 +1,36 @@
+# Refactoring claude.ai as API
+
+## Use Anthropic Python SDK
+
+```sh
+git clone https://github.com/engchina/anthropic-sdk-python.git; cd anthropic-sdk-python
+pip install -e . 
+```
+
+Add .env file
+
+```sh
+ANTHROPIC_API_KEY=sk-ant-sid01-lrLj7Mm_BXy5v28INPfupRrO1qTHWoQQGOVL5mP48asAsYnQgbFl61X7CgaGd-OmSbdrttI5vshyaJFJt16j2g-atc123456 # This is an invalided key
+```
+
+## Develop Anthropic Python SDK
+
+Install library
+
+```sh
+pip install python-dotenv
+```
+
+Modified files
+
+```sh
+        modified:   src/anthropic/_base_client.py
+        modified:   src/anthropic/_client.py
+        modified:   src/anthropic/_streaming.py
+        modified:   src/anthropic/resources/completions.py
+        modified:   src/anthropic/types/completion.py
+```
+
 # Anthropic Python API Library
 
 [![PyPI version](https://img.shields.io/pypi/v/anthropic.svg)](https://pypi.org/project/anthropic/)
@@ -10,7 +43,8 @@ and offers both synchronous and asynchronous clients powered by [httpx](https://
 
 In `v0.3.0`, we introduced a fully rewritten SDK.
 
-The new version uses separate sync and async clients, unified streaming, typed params and structured response objects, and resource-oriented methods:
+The new version uses separate sync and async clients, unified streaming, typed params and structured response objects,
+and resource-oriented methods:
 
 **Sync before/after:**
 
@@ -98,7 +132,8 @@ completion = anthropic.completions.create(
 print(completion.completion)
 ```
 
-While you can provide an `api_key` keyword argument, we recommend using [python-dotenv](https://pypi.org/project/python-dotenv/)
+While you can provide an `api_key` keyword argument, we recommend
+using [python-dotenv](https://pypi.org/project/python-dotenv/)
 and adding `ANTHROPIC_API_KEY="my api key"` to your `.env` file so that your API Key is not stored in source control.
 
 ## Async Usage
@@ -166,9 +201,12 @@ async for completion in stream:
 
 ## Using Types
 
-Nested request parameters are [TypedDicts](https://docs.python.org/3/library/typing.html#typing.TypedDict), while responses are [Pydantic](https://pydantic-docs.helpmanual.io/) models. This helps provide autocomplete and documentation within your editor.
+Nested request parameters are [TypedDicts](https://docs.python.org/3/library/typing.html#typing.TypedDict), while
+responses are [Pydantic](https://pydantic-docs.helpmanual.io/) models. This helps provide autocomplete and documentation
+within your editor.
 
-If you would like to see type errors in VS Code to help catch bugs earlier, set `python.analysis.typeCheckingMode` to `"basic"`.
+If you would like to see type errors in VS Code to help catch bugs earlier, set `python.analysis.typeCheckingMode`
+to `"basic"`.
 
 ## Token counting
 
@@ -181,7 +219,8 @@ client.count_tokens('Hello world!')  # 3
 
 ## Handling errors
 
-When the library is unable to connect to the API (e.g., due to network connection problems or a timeout), a subclass of `anthropic.APIConnectionError` is raised.
+When the library is unable to connect to the API (e.g., due to network connection problems or a timeout), a subclass
+of `anthropic.APIConnectionError` is raised.
 
 When the API returns a non-success status code (i.e., 4xx or 5xx
 response), a subclass of `anthropic.APIStatusError` will be raised, containing `status_code` and `response` properties.
@@ -213,7 +252,7 @@ except anthropic.APIStatusError as e:
 Error codes are as followed:
 
 | Status Code | Error Type                 |
-| ----------- | -------------------------- |
+|-------------|----------------------------|
 | 400         | `BadRequestError`          |
 | 401         | `AuthenticationError`      |
 | 403         | `PermissionDeniedError`    |
@@ -311,18 +350,22 @@ client = Anthropic(
 )
 ```
 
-See the httpx documentation for information about the [`proxies`](https://www.python-httpx.org/advanced/#http-proxying) and [`transport`](https://www.python-httpx.org/advanced/#custom-transports) keyword arguments.
+See the httpx documentation for information about the [`proxies`](https://www.python-httpx.org/advanced/#http-proxying)
+and [`transport`](https://www.python-httpx.org/advanced/#custom-transports) keyword arguments.
 
 ## Advanced: Managing HTTP resources
 
-By default we will close the underlying HTTP connections whenever the client is [garbage collected](https://docs.python.org/3/reference/datamodel.html#object.__del__) is called but you can also manually close the client using the `.close()` method if desired, or with a context manager that closes when exiting.
+By default we will close the underlying HTTP connections whenever the client
+is [garbage collected](https://docs.python.org/3/reference/datamodel.html#object.__del__) is called but you can also
+manually close the client using the `.close()` method if desired, or with a context manager that closes when exiting.
 
 ## Status
 
 This package is in beta. Its internals and interfaces are not stable and subject to change without a major semver bump;
 please reach out if you rely on any undocumented behavior.
 
-We are keen for your feedback; please open an [issue](https://www.github.com/anthropics/anthropic-sdk-python/issues) with questions, bugs, or suggestions.
+We are keen for your feedback; please open an [issue](https://www.github.com/anthropics/anthropic-sdk-python/issues)
+with questions, bugs, or suggestions.
 
 ## Requirements
 

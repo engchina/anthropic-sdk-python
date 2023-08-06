@@ -96,7 +96,10 @@ class Anthropic(SyncAPIClient):
         self.auth_token = auth_token or auth_token_envvar or None
 
         if base_url is None:
-            base_url = f"https://api.anthropic.com"
+            # modified by engchina on 20230806 begin
+            # base_url = f"https://api.anthropic.com"
+            base_url = "https://claude.ai"
+            # modified by engchina on 20230806 end
 
         super().__init__(
             version=__version__,
@@ -146,6 +149,18 @@ class Anthropic(SyncAPIClient):
         return {
             **super().default_headers,
             "anthropic-version": "2023-06-01",
+            # added by engchina on 20230806 begin
+            "Accept": "*/*",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Referer": "https://claude.ai/chats",
+            "Origin": "https://claude.ai",
+            "DNT": "1",
+            "Connection": "keep-alive",
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "same-origin",
+            "TE": "trailers",
+            # added by engchina on 20230806 end
             **self._custom_headers,
         }
 
@@ -287,7 +302,10 @@ class AsyncAnthropic(AsyncAPIClient):
         self.auth_token = auth_token or auth_token_envvar or None
 
         if base_url is None:
-            base_url = f"https://api.anthropic.com"
+            # modified by engchina on 20230806 begin
+            # base_url = f"https://api.anthropic.com"
+            base_url = "https://claude.ai"
+            # modified by engchina on 20230806 end
 
         super().__init__(
             version=__version__,

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import os
+import re
 import time
 import uuid
 import inspect
@@ -503,12 +505,29 @@ class BaseClient:
         # split is required to handle cases where additional information is included
         # in the response, e.g. application/json; charset=utf-8
         content_type, *_ = response.headers.get("content-type").split(";")
-        if content_type != "application/json":
+        # modified by engchina on 20230806 begin
+        # if content_type != "application/json":
+        if content_type not in ["application/json", "text/html", "text/event-stream"]:
             raise ValueError(
                 f"Expected Content-Type response header to be `application/json` but received {content_type} instead."
             )
+        # modified by engchina on 20230806 end
 
-        data = response.json()
+        # modified by engchina on 20230806 begin
+        # data = response.json()
+        match = re.match(r"data: (.*)", response.text)
+        if match:
+            response_read = response.read()
+            response_pattern = re.compile(r"data: ({.*?})")
+            response_matches = re.findall(response_pattern, response_read.decode("utf-8"))
+            response_list = [json.loads(match + "}") for match in response_matches]
+            completions = "".join([item["completion"] for item in response_list]).strip()
+            data = response_list[-1]
+            data["completion"] = completions
+        else:
+            data = response.json()
+        # modified by engchina on 20230806 begin
+
         return self._process_response_data(data=data, cast_to=cast_to, response=response)
 
     def _process_response_data(
@@ -563,7 +582,13 @@ class BaseClient:
 
     @property
     def user_agent(self) -> str:
-        return f"{self.__class__.__name__}/Python {self._version}"
+        # modified by engchina on 20230806 begin
+        # return f"{self.__class__.__name__}/Python {self._version}"
+        return (
+            f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+            f"Chrome/115.0.0.0 Safari/537.36 Edg/115.0.1901.178"
+        )
+        # modified by engchina on 20230806 end
 
     @property
     def base_url(self) -> URL:
@@ -676,6 +701,9 @@ class SyncAPIClient(BaseClient):
             transport=transport,  # type: ignore
             limits=limits,
             headers={"Accept": "application/json"},
+            # modified by engchina on 20230806 begin
+            cookies={"sessionKey": os.environ["ANTHROPIC_API_KEY"]},
+            # modified by engchina on 20230806 end
         )
 
     def is_closed(self) -> bool:
@@ -764,7 +792,10 @@ class SyncAPIClient(BaseClient):
         request = self._build_request(options)
 
         try:
-            response = self._client.send(request, auth=self.custom_auth, stream=stream)
+            # modified by engchina on 20230806 begin
+            # response = self._client.send(request, auth=self.custom_auth, stream=stream)
+            response = self._client.send(request, stream=stream)
+            # modified by engchina on 20230806 end
             response.raise_for_status()
         except httpx.HTTPStatusError as err:  # thrown on 4xx and 5xx status code
             if retries > 0 and self._should_retry(err.response):
@@ -1029,6 +1060,9 @@ class AsyncAPIClient(BaseClient):
             transport=transport,  # type: ignore
             limits=limits,
             headers={"Accept": "application/json"},
+            # added by engchina on 20230806 begin
+            cookies={"sessionKey": os.environ["ANTHROPIC_API_KEY"]},
+            # added by engchina on 20230806 end
         )
 
     def is_closed(self) -> bool:
@@ -1117,7 +1151,10 @@ class AsyncAPIClient(BaseClient):
         request = self._build_request(options)
 
         try:
-            response = await self._client.send(request, auth=self.custom_auth, stream=stream)
+            # modified by engchina on 20230806 begin
+            # response = await self._client.send(request, auth=self.custom_auth, stream=stream)
+            response = await self._client.send(request, stream=stream)
+            #  modified by engchina on 20230806 end
             response.raise_for_status()
         except httpx.HTTPStatusError as err:  # thrown on 4xx and 5xx status code
             if retries > 0 and self._should_retry(err.response):

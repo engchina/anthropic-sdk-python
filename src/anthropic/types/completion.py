@@ -21,3 +21,15 @@ class Completion(BaseModel):
       `stop_sequences` parameter, or a stop sequence built into the model
     - `"max_tokens"`: we exceeded `max_tokens_to_sample` or the model's maximum
     """
+
+
+# added by engchina on 20230806 begin
+class Organization(BaseModel):
+    uuid: str
+
+
+class ChatConversation(BaseModel):
+    uuid: str
+
+
+# added by engchina on 20230806 end

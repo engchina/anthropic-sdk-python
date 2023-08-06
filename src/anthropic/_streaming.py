@@ -46,6 +46,11 @@ class Stream(Generic[ResponseT]):
         process_data = self._client._process_response_data
 
         for sse in self._iter_events():
+            # added by engchina on 20230806 begin
+            if sse.event is None:
+                yield process_data(data=sse.json(), cast_to=cast_to, response=response)
+            # added by engchina on 20230806 end
+
             if sse.event == "completion":
                 yield process_data(data=sse.json(), cast_to=cast_to, response=response)
 
@@ -104,6 +109,11 @@ class AsyncStream(Generic[ResponseT]):
         process_data = self._client._process_response_data
 
         async for sse in self._iter_events():
+            # added by engchina on 20230806 begin
+            if sse.event is None:
+                yield process_data(data=sse.json(), cast_to=cast_to, response=response)
+            # added by engchina on 20230806 end
+
             if sse.event == "completion":
                 yield process_data(data=sse.json(), cast_to=cast_to, response=response)
 

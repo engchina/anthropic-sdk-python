@@ -1,11 +1,19 @@
 #!/usr/bin/env -S poetry run python
 
 import asyncio
+import os
 
 from anthropic import AI_PROMPT, HUMAN_PROMPT, Anthropic, APIStatusError, AsyncAnthropic
 
-client = Anthropic()
-async_client = AsyncAnthropic()
+# modified by engchina on 20230806 begin
+# client = Anthropic()
+# async_client = AsyncAnthropic()
+from dotenv import load_dotenv, find_dotenv
+_ = load_dotenv(find_dotenv())  # read local .env file
+
+client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+async_client = AsyncAnthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+# modified by engchina on 20230806 end
 
 question = """
 Hey Claude! How can I recursively list all files in a directory in Python?

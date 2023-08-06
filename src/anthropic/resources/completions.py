@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import uuid
 from typing import List, Union, overload
 from typing_extensions import Literal
 
@@ -13,6 +14,19 @@ from .._streaming import Stream, AsyncStream
 from .._base_client import make_request_options
 
 __all__ = ["Completions", "AsyncCompletions"]
+
+from ..types.completion import ChatConversation, Organization
+
+
+# added by engchina on 20230806 begin
+def generate_uuid():
+    random_uuid = uuid.uuid4()
+    random_uuid_str = str(random_uuid)
+    formatted_uuid = f"{random_uuid_str[0:8]}-{random_uuid_str[9:13]}-{random_uuid_str[14:18]}-{random_uuid_str[19:23]}-{random_uuid_str[24:]}"
+    return formatted_uuid
+
+
+# added by engchina on 20230806 end
 
 
 class Completions(SyncAPIResource):
@@ -222,8 +236,63 @@ class Completions(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | None | NotGiven = 600,
     ) -> Completion | Stream[Completion]:
+        # modified by engchina on 20230806 begin
+        # return self._post(
+        #     "/v1/complete",
+        #     body=maybe_transform(
+        #         {
+        #             "max_tokens_to_sample": max_tokens_to_sample,
+        #             "model": model,
+        #             "prompt": prompt,
+        #             "metadata": metadata,
+        #             "stop_sequences": stop_sequences,
+        #             "stream": stream,
+        #             "temperature": temperature,
+        #             "top_k": top_k,
+        #             "top_p": top_p,
+        #         },
+        #         completion_create_params.CompletionCreateParams,
+        #     ),
+        #     options=make_request_options(
+        #         extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+        #     ),
+        #     cast_to=Completion,
+        #     stream=stream or False,
+        #     stream_cls=Stream[Completion],
+        # )
+
+        organizations = self._get(
+            "/api/organizations",
+            options=make_request_options(
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+            ),
+            cast_to=Organization,
+            stream=False,
+            stream_cls=Stream[Organization],
+        )
+
+        organization_id = organizations[0].uuid
+
+        chat_conversation = self._post(
+            f"/api/organizations/{organization_id}/chat_conversations",
+            body=maybe_transform(
+                {
+                    "uuid": generate_uuid(),
+                    "name": "api",
+                },
+                completion_create_params.CompletionCreateParams,
+            ),
+            options=make_request_options(
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+            ),
+            cast_to=ChatConversation,
+            stream=False,
+            stream_cls=Stream[ChatConversation],
+        )
+
+        chat_conversation_id = chat_conversation.uuid
         return self._post(
-            "/v1/complete",
+            "/api/append_message",
             body=maybe_transform(
                 {
                     "max_tokens_to_sample": max_tokens_to_sample,
@@ -231,10 +300,20 @@ class Completions(SyncAPIResource):
                     "prompt": prompt,
                     "metadata": metadata,
                     "stop_sequences": stop_sequences,
-                    "stream": stream,
+                    "stream": stream or False,
                     "temperature": temperature,
                     "top_k": top_k,
                     "top_p": top_p,
+                    "completion": {
+                        "incremental": True,
+                        "prompt": prompt,
+                        "timezone": "Asia/Tokyo",
+                        "model": "claude-2",
+                    },
+                    "organization_uuid": organization_id,
+                    "conversation_uuid": chat_conversation_id,
+                    "text": prompt,
+                    "attachments": [],
                 },
                 completion_create_params.CompletionCreateParams,
             ),
@@ -245,6 +324,7 @@ class Completions(SyncAPIResource):
             stream=stream or False,
             stream_cls=Stream[Completion],
         )
+        # modified by engchina on 20230806 end
 
 
 class AsyncCompletions(AsyncAPIResource):
@@ -454,8 +534,64 @@ class AsyncCompletions(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | None | NotGiven = 600,
     ) -> Completion | AsyncStream[Completion]:
+        # modified by engchina on 20230806 begin
+        # return await self._post(
+        #     "/v1/complete",
+        #     body=maybe_transform(
+        #         {
+        #             "max_tokens_to_sample": max_tokens_to_sample,
+        #             "model": model,
+        #             "prompt": prompt,
+        #             "metadata": metadata,
+        #             "stop_sequences": stop_sequences,
+        #             "stream": stream,
+        #             "temperature": temperature,
+        #             "top_k": top_k,
+        #             "top_p": top_p,
+        #         },
+        #         completion_create_params.CompletionCreateParams,
+        #     ),
+        #     options=make_request_options(
+        #         extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+        #     ),
+        #     cast_to=Completion,
+        #     stream=stream or False,
+        #     stream_cls=AsyncStream[Completion],
+        # )
+
+        organizations = await self._get(
+            "/api/organizations",
+            options=make_request_options(
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+            ),
+            cast_to=Organization,
+            stream=False,
+            stream_cls=Stream[Organization],
+        )
+
+        organization_id = organizations[0].uuid
+
+        chat_conversation = await self._post(
+            f"/api/organizations/{organization_id}/chat_conversations",
+            body=maybe_transform(
+                {
+                    "uuid": generate_uuid(),
+                    "name": "api",
+                },
+                completion_create_params.CompletionCreateParams,
+            ),
+            options=make_request_options(
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+            ),
+            cast_to=ChatConversation,
+            stream=False,
+            stream_cls=Stream[ChatConversation],
+        )
+
+        chat_conversation_id = chat_conversation.uuid
+
         return await self._post(
-            "/v1/complete",
+            "/api/append_message",
             body=maybe_transform(
                 {
                     "max_tokens_to_sample": max_tokens_to_sample,
@@ -467,6 +603,16 @@ class AsyncCompletions(AsyncAPIResource):
                     "temperature": temperature,
                     "top_k": top_k,
                     "top_p": top_p,
+                    "completion": {
+                        "incremental": True,
+                        "prompt": prompt,
+                        "timezone": "Asia/Tokyo",
+                        "model": "claude-2",
+                    },
+                    "organization_uuid": organization_id,
+                    "conversation_uuid": chat_conversation_id,
+                    "text": prompt,
+                    "attachments": [],
                 },
                 completion_create_params.CompletionCreateParams,
             ),
@@ -477,3 +623,4 @@ class AsyncCompletions(AsyncAPIResource):
             stream=stream or False,
             stream_cls=AsyncStream[Completion],
         )
+        # modified by engchina on 20230806 end
